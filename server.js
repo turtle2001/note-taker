@@ -1,7 +1,8 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const notes = require('./db/db.json');
+let notes = require('./db/db.json');
+const { title } = require('process');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -23,15 +24,37 @@ app.get('/api/notes', (req, res) => {
 
 app.post('/api/notes', (req, res) => {
     console.info(`${req.method} request received`);
+    const { title, text } = req.body;
+    if (title && text) {
+        const newNote = {
+            title,
+            text,
+        };
 
-    const [...list] = notes;
-    console.log(list);
-    if (list) {
-        
+        fs.readFile('./db/db.json', 'utf-8', (err, res) => {
+            if (err) {
+                console.error(err);
+            } else {
+                const data = JSON.parse(res);
+                data.push(newNote);
+                notes = data;
+                fs.writeFile('./db/db.json', JSON.stringify(data, null, 4),
+                    (err2) => err2 ? console.error(err2) : console.info('Notes Updated!')
+                );
+            }
+        });
+
+        const response = {
+            status: 'success',
+            body: newNote,
+        };
+
+        console.log(response);
+        res.json(response);
     }
-    else {
+    else
         res.json('Error in posting notes');
-    }
+
 });
 
 app.listen(PORT, () =>
