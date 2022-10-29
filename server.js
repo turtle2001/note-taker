@@ -25,12 +25,13 @@ app.get('/api/notes', (req, res) => {
 
 app.post('/api/notes', (req, res) => {
     console.info(`${req.method} request received`);
-    const { title, text } = req.body;
+    const { title, text } = req.body;   //takes response and deconstructs it into title, text
+    
     if (title && text) {
         const newNote = {
             title,
             text,
-            id: uniqid(),
+            id: uniqid(),   //assigns id
         };
 
         fs.readFile('./db/db.json', 'utf-8', (err, res) => {
@@ -38,7 +39,7 @@ app.post('/api/notes', (req, res) => {
                 console.error(err);
             } else {
                 const data = JSON.parse(res);
-                data.push(newNote);
+                data.push(newNote); //pushes newnote to db.json
                 notes = data;
                 fs.writeFile('./db/db.json', JSON.stringify(data, null, 3),
                     (err2) => err2 ? console.error(err2) : console.info('Notes Updated!')
@@ -46,15 +47,10 @@ app.post('/api/notes', (req, res) => {
             }
         });
 
-
-        res.json({
-            status: 'success',
-            body: newNote,
-        });
+        res.json({ status: 'success', body: newNote, });
     }
     else
         res.json('Error in posting notes');
-
 });
 
 app.listen(PORT, () =>
