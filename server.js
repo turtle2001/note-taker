@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 let notes = require('./db/db.json');
 const { title } = require('process');
-const uniqid = require("uniqid");
+const uuid = require('uuid');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
@@ -40,19 +40,17 @@ app.post('/api/notes', (req, res) => {
                 const data = JSON.parse(res);
                 data.push(newNote);
                 notes = data;
-                fs.writeFile('./db/db.json', JSON.stringify(data, null, 4),
+                fs.writeFile('./db/db.json', JSON.stringify(data, null, 3),
                     (err2) => err2 ? console.error(err2) : console.info('Notes Updated!')
                 );
             }
         });
 
-        const response = {
+
+        res.json({
             status: 'success',
             body: newNote,
-        };
-
-        console.log(response);
-        res.json(response);
+        });
     }
     else
         res.json('Error in posting notes');
